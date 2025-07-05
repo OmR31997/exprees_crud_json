@@ -9,6 +9,7 @@ import { pageUI } from './Controller/StudentController.js';
 import StudentRoute from './Routes/StudentRoute.js';
 import isAuthenticated from './Middleware/auth.js';
 import DownloadRoute from './Routes/DownloadRoute.js';
+import MongoStore from 'connect-mongo';
 
 dotenv.config();
 
@@ -28,6 +29,10 @@ appServer.use(session({
     secret: '@$1025$@', // Secret key for session encryption
     resave: false, // Don't save session if not modified
     saveUninitialized: false, // Don't create session until something is stored
+    store:MongoStore.create({
+        mongoUrl:process.env.MONGO_URL,
+        collectionName:'sessions'
+    }),
     cookie: {
         httpOnly: true, // Prevent client-side JS from accessing cookies
         secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
