@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Management (SPA)</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+    <link href="/sweetAlert/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .is-invalid {
+            border: 1px solid red !important;
+        }
+
+
+        .invalid-feedback {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+
+        .navbar-nav .nav-link {
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        /* Hover State */
+        .navbar-nav .nav-link:hover {
+            color: #198754 !important;
+            /* Bootstrap green */
+            background-color: #e6f4ea;
+            font-weight: 500;
+        }
+
+        /* Active State */
+        .navbar-nav .nav-link.active {
+            border-radius: 0.25rem;
+            font-weight: bold;
+        }
+
+        #page-loader {
+            transition: opacity 0.5s ease;
+        }
+
+        .fade-out {
+            opacity: 0;
+        }
+
+        #page-loader.fade-out {
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loader Overlay -->
+    <div id="page-loader"
+        class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white"
+        style="z-index: 9999;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" id="navbarSupportContent">
+        <div class="container-fluid">
+            <button onclick="showPage('home')"
+                class="navbar-brand p-3 bg-success text-white rounded-circle">CMS</button>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <button onclick="showPage('home')" class="nav-link active cursor-pointer">Home</button>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="showPage('register')" class="nav-link active cursor-pointer">Register
+                            Student</button>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="showPage('status')" id="registered-students"
+                            class="nav-link active cursor-pointer">
+                            Status</button>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="showPage('marksheet')"
+                            class="nav-link active cursor-pointer">Marksheet</button>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="showPage('result')" class="nav-link active cursor-pointer">Result</button>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="showPage('export')" class="nav-link active cursor-pointer">Export</button>
+                    </li>
+                </ul>
+
+                <!-- 🔥 Logout Button -->
+                <button id="logOut"
+                    class="btn btn-danger px-4 py-2 rounded-pill shadow-sm fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="home" class="container mt-4 page">
+        <div class="p-5 mb-4 bg-light roundea-3 shadow-sm">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">Welcome to College Management System</h1>
+                <p class="col-md-8 fs-5">
+                    This is a simple and efficient single-page application (SPA) built with Express and Bootstrap.
+                    Manage student records, register new students, and generate marksheets – all in one place!
+                </p>
+                <button onclick="showPage('register')" class="btn btn-primary btn-lg mt-3">Register a Student</button>
+                <button onclick="showPage('marksheet')" class="btn btn-outline-success btn-lg mt-3 ms-2">View
+                    Marksheet</button>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card border-success mb-3 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        Student Registration
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Easily register new students by providing basic information such as name
+                            and roll number.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-primary mb-3 shadow-sm">
+                    <div class="card-header bg-primary text-white">Marksheet Entry</div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Enter and update student marks in a structured and user-friendly way.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-primary mb-3 shadow-sm">
+                    <div class="card-header bg-primary text-white">Student Report</div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            View all students and their marks in a neatly organized report table.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="register" class="container mt-4 page" style="display: none;">
+        <h2 class="text-center text-success">Register Student</h2>
+
+        <form id="registerForm" class="mt-5" enctype="multipart/form-data">
+            <div class="col-12 mb-2">
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label for="name" class="form-label">Name</label>
+                        <input name="name" id="name" type="text" class="form-control" placeholder="Student Name">
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input name="email" id="email" type="text" class="form-control" placeholder="@email.com">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label for="course" class="form-label">Course</label>
+                        <input name="course" type="text" id="course" class="form-control" placeholder="Course Name">
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label for="mno" class="form-label">Mobile No.</label>
+                        <input name="mno" id="mno" type="text" class="form-control" placeholder="Mobile No.">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label for="dobInput" class="form-label">D.O.B.</label>
+                        <div class="position-relative">
+                            <input type="text" id="dobInput" class="form-control" placeholder="DD-MM-YYYY" readonly />
+                            <input type="date" id="dobPicker" name="dobDate"
+                                class="position-absolute top-100 start-0 opacity-0 z-1 pe-none"
+                                style="width: 0; height: 0;">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea name="address" id="address" type="text" class="form-control"
+                            placeholder="Current Address"></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-lg-6 d-flex gap-5">
+                        <div>
+                            <label>Profile Pic</label>
+                            <input type="file" name="profilePic" id="profilePic" class="form-control">
+                        </div>
+                        <div>
+                            <label>Signature</label>
+                            <input type="file" name="signature" id="signature" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>Last Exam Marksheet</label>
+                        <input type="file" name="sheetCopy" id="sheetCopy" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-lg-6 d-flex gap-5">
+                        <div class="w-50">
+                            <img src="#" id="picPreview" alt="Image" class="w-50 h-50" style="display: none;" />
+                        </div>
+                        <div class="w-50">
+                            <img src="#" id="signPreview" alt="Image" class="w-50 h-50" style="display: none;" />
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="#" id="sheetPreview" alt="Image" class="w-50" style="display: none;" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-3">
+                    <button type="submit" class="btn btn-success w-100">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="status" class="m-5 page" style="display: none;">
+        <h2 class="mb-4">📋 Students Registration Status</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>D.O.B.</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Mobile</th>
+                        <th>Address</th>
+                        <th>Profile | Sign | Last Marksheet</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="student-record">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="container" style="width: 30%;">
+            <form id="roll-form">
+                <input type="text" name="name" placeholder="Enter Full Name" class="form-control mb-2" />
+                <input type="email" name="email" placeholder="Enter Email" class="form-control mb-2" />
+                <button type="submit" class="btn btn-success mb-2 w-100">Get Roll No</button>
+            </form>
+
+            <div id="roll-result" class="mt-3 alert alert-success d-none"></div>
+        </div>
+    </div>
+
+    <div id="marksheet" class="container mt-4 page" style="display:none;">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">🎓 Student Marksheet</h4>
+            </div>
+            <div class="card-body">
+                <form id="marksheetForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="studentName" class="form-label">Student Name</label>
+                            <input name="name" id="studentName" type="text" placeholder="Enter full name"
+                                class="form-control">
+                            <span id="error-name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="rollNumber" class="form-label">Roll Number</label>
+                            <input name="rollNo" id="rollNumber" type="text" placeholder="e.g. 123456"
+                                class="form-control">
+                            <span id="error-rollNo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Enter Subject Marks</h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="math" class="form-label">Mathematics</label>
+                            <input id="math" name="math" type="text" class="form-control" placeholder="Mark out of 100"
+                                min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="science" class="form-label">Science</label>
+                            <input id="science" name="science" type="text" class="form-control"
+                                placeholder="Mark out of 100" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="english" class="form-label">English</label>
+                            <input id="english" name="english" type="text" class="form-control"
+                                placeholder="Mark out of 100" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="history" class="form-label">History</label>
+                            <input id="history" name="history" type="text" class="form-control"
+                                placeholder="Mark out of 100" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="computer" class="form-label">Computer</label>
+                            <input id="computer" name="computer" type="text" class="form-control"
+                                placeholder="Mark out of 100" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="nativeLanguage" class="form-label">Native Language</label>
+                            <input id="nativeLanguage" name="nativeLanguage" type="text" class="form-control"
+                                placeholder="Mark out of 100" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="additionalLanguage" class="form-label">Additional Language (Optional)</label>
+                            <input id="additionalLanguage" name="additionalLanguage" type="text" class="form-control"
+                                placeholder="Mark out of 100 " min="0" max="100">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success mt-4">Generate Marksheet</button>
+                </form>
+
+                <div id="marksheetResult" class="alert alert-success mt-4 d-none">
+                    <h5 class="alert-heading">Result Summary</h5>
+                    <div id="marksSummary" class="mb-0"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result" class="container mt-4 page" style="display:none;">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">🎓 Result </h4>
+            </div>
+            <div class="card-body">
+                <form id="resultForm" class="d-flex justify-content-center">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input name="rollNo" id="rollNumber" type="text" placeholder="e.g. 123456"
+                                class="form-control w-100">
+                        </div>
+
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-success">Get Result</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="view-result"></div>
+    </div>
+
+    <div id="export" class="container mt-4 page" style="display: none;">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0">📤 Export Student Data</h3>
+            </div>
+
+            <div class="card-body p-4">
+                <p class="mb-4 text-muted text-center">
+                    Select your preferred file format below to download the student data.
+                </p>
+
+                <div class="row g-4 text-center">
+                    <!-- JSON Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">📦 JSON Format</h5>
+                            <a href="/api/export/download/json" class="btn btn-outline-dark w-100">Download JSON</a>
+                        </div>
+                    </div>
+
+                    <!-- Excel Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">📊 Excel Format</h5>
+                            <a href="/api/export/download/excel" class="btn btn-outline-success w-100">Download
+                                Excel</a>
+                        </div>
+                    </div>
+
+                    <!-- CSV Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">📄 CSV Format</h5>
+                            <a href="/api/export/download/csv" class="btn btn-outline-primary w-100">Download CSV</a>
+                        </div>
+                    </div>
+
+                    <!-- XML Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">🗂️ XML Format</h5>
+                            <a href="/api/export/download/xml" class="btn btn-outline-warning w-100">Download XML</a>
+                        </div>
+                    </div>
+
+                    <!-- PDF Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">👝 PDF Format</h5>
+                            <a href="/api/export/download/pdf" class="btn btn-outline-danger w-100">Download PDF</a>
+                        </div>
+                    </div>
+
+                    <!-- Text Export -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 shadow-sm">
+                            <h5 class="mb-2">📄 Text Format</h5>
+                            <a href="/api/export/download/plainText" class="btn btn-outline-info w-100">Download
+                                Text</a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-5">
+
+                <div class="text-center">
+                    <small class="text-muted">Data Source: <code>JSON File</code></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer bg-body-tertiary text-body-secondary text-center py-2" style="margin-top: 6rem;">
+        All rights reserved.
+    </div>
+
+    <div class="modal fade" id="viewProfilePic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Student Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <img src="#" id="studentPic" alt="StudentPicture" class="w-100 rounded">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewSignPic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Signature Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <img src="#" id="studentSign" alt="SignPicture" class="w-100 rounded">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewSheet" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sheet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <img src="#" id="studentSheet" alt="MarksheetDoc" class="w-100 rounded">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Updating Student -->
+    <div class="modal fade" id="updateModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="model-title" id="updateModalLabel">
+                        Update Student Information
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="update-student-form" enctype="multipart/form-data">
+                        <div class="col-12 mb-2">
+                            <div class="row mb-3">
+                                <input name="studentId" hidden />
+                                <div class="col-lg-6">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input name="name" id="updateName" type="text" class="form-control"
+                                        placeholder="Student Name">
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input name="email" id="updateEmail" type="text" class="form-control"
+                                        placeholder="@email.com">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="course" class="form-label">Course</label>
+                                    <input name="course" type="text" id="updateCourse" class="form-control"
+                                        placeholder="Course Name" />
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="mno" class="form-label">Mobile No.</label>
+                                    <input name="mno" type="text" id="updateMno" class="form-control"
+                                        placeholder="Mobile No." />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="dobInput" class="form-label">D.O.B.</label>
+                                    <div class="position-relative">
+                                        <input type="text" id="updateDOB" class="form-control" placeholder="DD-MM-YYYY"
+                                            readonly />
+                                        <input type="date" id="updDobPicker" name="dobDate"
+                                            class="position-absolute top-100 start-0 opacity-0 z-1 pe-none"
+                                            style="width: 0; height: 0;">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea name="address" id="updateAddress" type="text" class="form-control"
+                                        placeholder="Current Address"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-6 d-flex gap-5">
+                                    <div>
+                                        <label>Profile Pic</label>
+                                        <input type="file" name="profilePic" id="profilePic" class="form-control">
+                                    </div>
+                                    <div>
+                                        <label>Signature</label>
+                                        <input type="file" name="signature" id="signature" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label>Last Exam Marksheet</label>
+                                    <input type="file" name="sheetCopy" id="sheetCopy" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-6 d-flex gap-5">
+                                    <div class="w-50">
+                                        <img src="#" id="updatePreviewImage" alt="Image" class="w-50 h-50"
+                                            style="display: none;" />
+                                    </div>
+                                    <div class="w-50">
+                                        <img src="#" id="updatePreviewSignature" alt="Image" class="w-50 h-50"
+                                            style="display: none;" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <img src="#" id="updatePreviewSheet" alt="Image" class="w-50"
+                                        style="display: none;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-3">
+                                <button type="submit" class="btn btn-warning w-100">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/sweetAlert/sweetalert2.min.js"></script>
+
+    <script>
+        // Inially Loading
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('page-loader');
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.style.display = 'none', 500);
+        });
+
+        const showLoader = () => {
+            document.getElementById('page-loader').style.display = 'flex';
+        }
+        const hideLoader = () => {
+            const loader = document.getElementById('page-loader');
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+    </script>
+</body>
+
+</html>

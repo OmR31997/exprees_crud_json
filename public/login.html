@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login | CMS</title>
+  <!-- Add Bootstrap CSS -->
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+  <style>
+    #page-loader {
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+    }
+
+    #page-loader.fade-out {
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="bg-light min-vh-100 d-flex justify-content-center align-items-center">
+
+  <!-- Loader Overlay -->
+  <div id="page-loader"
+    class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white"
+    style="z-index: 9999;">
+    <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="card w-100" style="max-width: 400px;">
+    <!-- Header -->
+    <div class="card-header bg-success text-white text-center">
+      <span class="h4">🔐</span> Login to CMS
+    </div>
+
+    <!-- Form -->
+    <form id="logForm" method="post" class="p-4">
+      <!-- UserName -->
+      <div class="form-group mb-2">
+        <label for="userName">UserName</label>
+        <input name="userName" id="userName" type="text" placeholder="Enter User Name" class="form-control" required />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group mb-2">
+        <label for="password">Password</label>
+        <input name="password" id="password" type="password" placeholder="Enter password" class="form-control"
+          required />
+      </div>
+
+      <!-- Login Button -->
+      <div class="form-group mb-2 mt-3 text-end">
+        <button type="submit" class="btn btn-success btn-block w-100">
+          Login
+        </button>
+      </div>
+
+      <!-- Auth Message -->
+      <div id="authMsg" class="mt-3"></div>
+    </form>
+  </div>
+
+  <!-- Add Bootstrap JS (Optional for modal, alerts, etc.) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="/bootstrap/js/bootstrap.min.js"></script>
+
+  <script>
+    document.getElementById('logForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      const userName = formData.get('userName').trim();
+      const password = formData.get('password').trim();
+
+      showLoader(); // before fetch
+      try {
+
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userName, password })
+        });
+
+        const result = await response.text();
+
+        const authMsg = document.getElementById('authMsg');
+
+        if (response.ok) {
+          authMsg.innerText = result;
+          authMsg.classList.add('alert', 'alert-success');
+          authMsg.classList.remove('d-none');
+
+          // Redirect after short delay
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        }
+        else {
+          authMsg.innerText = result;
+          authMsg.classList.add('alert', 'alert-danger');
+          authMsg.classList.remove('d-none');
+        }
+      } catch (error) {
+        const authMsg = document.getElementById('authMsg');
+        authMsg.innerText = "An unexpected error occurred: " + error.message;
+        authMsg.classList.add('alert', 'alert-danger');
+        authMsg.classList.remove('d-none');
+      }
+      hideLoader(); // after response
+    });
+
+    // Inially Loading
+    document.addEventListener('DOMContentLoaded', () => {
+      const loader = document.getElementById('page-loader');
+      loader.classList.add('fade-out');
+      setTimeout(() => loader.style.display = 'none', 500);
+    });
+
+
+    const showLoader = () =>{
+      document.getElementById('page-loader').style.display = 'flex';
+    }
+    const hideLoader = () =>{
+      const loader = document.getElementById('page-loader');
+      loader.classList.add('fade-out');
+      setTimeout(() => loader.style.display = 'none', 500);
+    }
+
+  </script>
+
+</body>
+
+</html>
