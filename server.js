@@ -86,5 +86,5 @@ appServer.get('/', isAuthenticated, pageUI);
 appServer.get('/:page', isAuthenticated, pageUI);
 
 // 🚀 Start the server
-const port = 9000;
+const port = process.env.PORT;
 appServer.listen(port, () => console.log(`Server is running on http://localhost:${port}`));
