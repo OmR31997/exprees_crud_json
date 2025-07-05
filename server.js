@@ -25,6 +25,9 @@ appServer.use(express.json());
 appServer.use(express.urlencoded({ extended: true }));
 
 // 🔐 Configure session management
+
+appServer.set('trust proxy', 1); 
+
 appServer.use(session({
     secret: '@$1025$@', // Secret key for session encryption
     resave: false, // Don't save session if not modified
