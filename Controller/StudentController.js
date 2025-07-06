@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 import path from "path";
 import fs from 'fs/promises';
+import fsOld from 'fs';
 import { fileURLToPath } from "url";
 import { v4 as uuid4V } from 'uuid';
 
@@ -149,25 +150,40 @@ export const updateStudent = async (req, res) => {
   try {
     const students = await readDB();
     const id = req.params.id;
-    const data = req.body;
+    const updatedData = req.body;
 
     if (!id) {
       return res.status(401).json({ error: 'Id must be required' });
     }
 
+    const deleteFile = (oldPath) => {
+      const fullPath = path.join('public', 'uploads', oldPath);
+      if (fsOld.existsSync(fullPath)) {
+        fsOld.unlinkSync(fullPath); // Or use fs.promises.unlink for async
+      }
+    };
+    
     let isUpdated = false;
 
     const updatedStudents = students.map(student => {
       if (student.id === id) {
         isUpdated = true;
 
-        const updatedData = {
-          ...data,
-          profilePic: req.files?.profilePic?.[0]?.filename || student.profilePic,
-          signature: req.files?.signature?.[0]?.filename || student.signature,
-          sheetCopy: req.files?.sheetCopy?.[0]?.filename || student.sheetCopy
-        };
-        
+        if (req.files?.profilePic?.[0]) {
+          deleteFile(student.profilePic);
+          student.profilePic = req.files?.profilePic?.[0]?.filename
+        }
+
+        if (req.files?.signature?.[0]) {
+          deleteFile(student.signature);
+          student.signature = req.files?.signature?.[0].filename
+        }
+
+        if (req.files?.sheetCopy?.[0]) {
+          deleteFile(student.sheetCopy);
+          student.sheetCopy = req.files?.sheetCopy?.[0]?.filename
+        }
+
         return {
           ...student,
           ...updatedData,
