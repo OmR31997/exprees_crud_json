@@ -248,7 +248,7 @@
 
     <div id="status" class="m-5 page" style="display: none;">
         <h2 class="mb-4">📋 Students Registration Status</h2>
-        <div class="table-responsive">
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-bordered table-hover align-middle text-center">
                 <thead class="table-dark">
                     <tr>
@@ -269,14 +269,24 @@
             </table>
         </div>
 
-        <div class="container" style="width: 30%;">
-            <form id="roll-form">
-                <input type="text" name="name" placeholder="Enter Full Name" class="form-control mb-2" />
-                <input type="email" name="email" placeholder="Enter Email" class="form-control mb-2" />
-                <button type="submit" class="btn btn-success mb-2 w-100">Get Roll No</button>
-            </form>
+        <div id="student-status" class="d-block d-md-none"></div>
 
-            <div id="roll-result" class="mt-3 alert alert-success d-none"></div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="text-center mb-3">🎓 Get Roll Number</h5>
+                        <form id="roll-form">
+                            <input type="text" name="name" placeholder="Enter Full Name" class="form-control mb-3"
+                                required />
+                            <input type="email" name="email" placeholder="Enter Email" class="form-control mb-3"
+                                required />
+                            <button type="submit" class="btn btn-success w-100">Get Roll No</button>
+                        </form>
+                        <div id="roll-result" class="alert alert-success d-none mt-3"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -497,104 +507,99 @@
     </div>
 
     <!-- Modal for Updating Student -->
-    <div class="modal fade" id="updateModal" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Wider modal -->
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="model-title" id="updateModalLabel">
-                        Update Student Information
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Update Student Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
                     <form id="update-student-form" enctype="multipart/form-data">
-                        <div class="col-12 mb-2">
-                            <div class="row mb-3">
-                                <input name="studentId" hidden />
-                                <div class="col-lg-6">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input name="name" id="updateName" type="text" class="form-control"
-                                        placeholder="Student Name">
-                                </div>
+                        <input type="hidden" name="studentId" />
 
-                                <div class="col-lg-6">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input name="email" id="updateEmail" type="text" class="form-control"
-                                        placeholder="@email.com">
-                                </div>
+                        <div class="row g-3"> <!-- Grid with spacing -->
+
+                            <!-- Name & Email -->
+                            <div class="col-md-6">
+                                <label for="updateName" class="form-label">Full Name</label>
+                                <input type="text" id="updateName" name="name" class="form-control"
+                                    placeholder="Student Name" required>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-lg-6">
-                                    <label for="course" class="form-label">Course</label>
-                                    <input name="course" type="text" id="updateCourse" class="form-control"
-                                        placeholder="Course Name" />
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <label for="mno" class="form-label">Mobile No.</label>
-                                    <input name="mno" type="text" id="updateMno" class="form-control"
-                                        placeholder="Mobile No." />
-                                </div>
+                            <div class="col-md-6">
+                                <label for="updateEmail" class="form-label">Email</label>
+                                <input type="email" id="updateEmail" name="email" class="form-control"
+                                    placeholder="example@email.com" required>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-lg-6">
-                                    <label for="dobInput" class="form-label">D.O.B.</label>
-                                    <div class="position-relative">
-                                        <input type="text" id="updateDOB" class="form-control" placeholder="DD-MM-YYYY"
-                                            readonly />
-                                        <input type="date" id="updDobPicker" name="dobDate"
-                                            class="position-absolute top-100 start-0 opacity-0 z-1 pe-none"
-                                            style="width: 0; height: 0;">
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <label for="address" class="form-label">Address</label>
-                                    <textarea name="address" id="updateAddress" type="text" class="form-control"
-                                        placeholder="Current Address"></textarea>
-                                </div>
+                            <!-- Course & Mobile -->
+                            <div class="col-md-6">
+                                <label for="updateCourse" class="form-label">Course</label>
+                                <input type="text" id="updateCourse" name="course" class="form-control"
+                                    placeholder="Course Name">
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-lg-6 d-flex gap-5">
-                                    <div>
-                                        <label>Profile Pic</label>
-                                        <input type="file" name="profilePic" id="profilePic" class="form-control">
-                                    </div>
-                                    <div>
-                                        <label>Signature</label>
-                                        <input type="file" name="signature" id="signature" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label>Last Exam Marksheet</label>
-                                    <input type="file" name="sheetCopy" id="sheetCopy" class="form-control">
-                                </div>
+                            <div class="col-md-6">
+                                <label for="updateMno" class="form-label">Mobile No.</label>
+                                <input type="text" id="updateMno" name="mno" class="form-control"
+                                    placeholder="10-digit mobile number">
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-lg-6 d-flex gap-5">
-                                    <div class="w-50">
-                                        <img src="#" id="updatePreviewImage" alt="Image" class="w-50 h-50"
-                                            style="display: none;" />
-                                    </div>
-                                    <div class="w-50">
-                                        <img src="#" id="updatePreviewSignature" alt="Image" class="w-50 h-50"
-                                            style="display: none;" />
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <img src="#" id="updatePreviewSheet" alt="Image" class="w-50"
-                                        style="display: none;" />
-                                </div>
+                            <!-- DOB & Address -->
+                            <div class="col-md-6">
+                                <label for="updateDOB" class="form-label">Date of Birth</label>
+                                <input type="text" id="updateDOB" class="form-control" placeholder="DD-MM-YYYY"
+                                    readonly>
+                                <input type="date" id="updDobPicker" name="dobDate" class="form-control mt-1 d-none">
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-3">
-                                <button type="submit" class="btn btn-warning w-100">Update</button>
+                            <div class="col-md-6">
+                                <label for="updateAddress" class="form-label">Address</label>
+                                <textarea id="updateAddress" name="address" rows="2" class="form-control"
+                                    placeholder="Current Address"></textarea>
+                            </div>
+
+                            <!-- File Uploads -->
+                            <div class="col-md-4">
+                                <label for="profilePic" class="form-label">Profile Picture</label>
+                                <input type="file" name="profilePic" id="profilePic" class="form-control">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="signature" class="form-label">Signature</label>
+                                <input type="file" name="signature" id="signature" class="form-control">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="sheetCopy" class="form-label">Last Marksheet</label>
+                                <input type="file" name="sheetCopy" id="sheetCopy" class="form-control">
+                            </div>
+
+                            <!-- Image Previews -->
+                            <div class="col-md-4 text-center">
+                                <img src="#" id="updatePreviewImage" alt="Profile Preview" class="img-thumbnail w-100"
+                                    style="display:none;" />
+                                <p class="small text-muted mt-1">Profile</p>
+                            </div>
+
+                            <div class="col-md-4 text-center">
+                                <img src="#" id="updatePreviewSignature" alt="Signature Preview"
+                                    class="img-thumbnail w-100" style="display:none;" />
+                                <p class="small text-muted mt-1">Signature</p>
+                            </div>
+
+                            <div class="col-md-4 text-center">
+                                <img src="#" id="updatePreviewSheet" alt="Marksheet Preview" class="img-thumbnail w-100"
+                                    style="display:none;" />
+                                <p class="small text-muted mt-1">Marksheet</p>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-warning">Update Student</button>
                             </div>
                         </div>
                     </form>

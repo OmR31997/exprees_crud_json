@@ -747,6 +747,7 @@ document.getElementById('resultForm').addEventListener('submit', async (e) => {
 
 window.addEventListener('load', async () => {
     const studentRecord = document.getElementById('student-record');
+    const studentStatus = document.getElementById('student-status');
 
     let students;
     try {
@@ -754,35 +755,72 @@ window.addEventListener('load', async () => {
         students = await response.json();
 
         studentRecord.innerHTML = students.map((student, index) => `<tr>
-    <td>${index + 1}</td>
-    <td>${student.name}</td>
-    <td>${new Date(student.dobDate).toLocaleDateString('en-GB')}</td>
-    <td>${student.email}</td>
-    <td>${student.course}</td>
-    <td>${student.mno}</td>
-    <td>${student.address}</td>
-    <td>
-        <button type="button" class="btn btn-primary view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">View</button>
-        <button type="button" class="btn btn-primary view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">View</button> 
-        <button type="button" class="btn btn-primary view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">View</button>
-    </td>
-    <td>
-        <button type="button" class="btn btn-warning" 
-            data-profilePic="${student.profilePic}"
-            data-signature="${student.signature}"
-            data-sheetcopy="${student.sheetCopy}"
-            data-id="${student.id}" 
-            data-name="${student.name}"
-            data-dob="${student.dobDate}"
-            data-email="${student.email}"
-            data-course="${student.course}"
-            data-mno="${student.mno}"
-            data-address="${student.address}">✏️</button> 
-        <button type="button" class="btn btn-danger" data-id="${student.id}">X</button>
-    </td>
-    <td><div class="rounded-circle bg-success d-inline-block" style="width: 10px; height: 10px;"></div></td>
-    </tr>`)
+        <td>${index + 1}</td>
+        <td>${student.name}</td>
+        <td>${new Date(student.dobDate).toLocaleDateString('en-GB')}</td>
+        <td>${student.email}</td>
+        <td>${student.course}</td>
+        <td>${student.mno}</td>
+        <td>${student.address}</td>
+        <td>
+            <button type="button" class="btn btn-primary view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">View</button>
+            <button type="button" class="btn btn-primary view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">View</button> 
+            <button type="button" class="btn btn-primary view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">View</button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-warning" 
+                data-profilePic="${student.profilePic}"
+                data-signature="${student.signature}"
+                data-sheetcopy="${student.sheetCopy}"
+                data-id="${student.id}" 
+                data-name="${student.name}"
+                data-dob="${student.dobDate}"
+                data-email="${student.email}"
+                data-course="${student.course}"
+                data-mno="${student.mno}"
+                data-address="${student.address}">✏️</button> 
+            <button type="button" class="btn btn-danger" data-id="${student.id}">X</button>
+        </td>
+        <td><div class="rounded-circle bg-success d-inline-block" style="width: 10px; height: 10px;"></div></td>
+        </tr>`);
 
+        studentStatus.innerHTML = students.map((student, index) => `  <div class="row" id="student-record-cards">
+        
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">👤 ${student.name}</h5>
+              <p class="card-text"><strong>Email:</strong> ${student.email}</p>
+              <p class="card-text"><strong>DOB:</strong> ${new Date(student.dobDate).toLocaleDateString('en-GB')}</p>
+              <p class="card-text"><strong>Course:</strong> ${student.course}</p>
+              <p class="card-text"><strong>Mobile:</strong> ${student.mno}</p>
+              <p class="card-text"><strong>Address:</strong> ${student.address}</p>
+              <div class="mb-2">
+                <strong>Docs:</strong><br />
+                <a href="#" class="view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">Profile</a> |
+                <a href="#" class="view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">Sign</a> |
+                <a href="#" class="view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">Marksheet</a>
+              </div>
+              <div class="mb-2">
+                <button type="button" class="btn btn-warning" 
+                     data-profilePic="${student.profilePic}"
+                     data-signature="${student.signature}"
+                     data-sheetcopy="${student.sheetCopy}"
+                     data-id="${student.id}" 
+                     data-name="${student.name}"
+                     data-dob="${student.dobDate}"
+                     data-email="${student.email}"
+                     data-course="${student.course}"
+                     data-mno="${student.mno}"
+                     data-address="${student.address}">Update</button> 
+                <button type="button" class="btn btn-danger" data-id="${student.id}">Delete</button>
+              </div>
+            </div>
+            <div class="card-footer text-muted text-center">✅ Approved</div>
+          </div>
+        </div>
+      </div>
+    `);
         // Event delegation for view-profile buttons
         studentRecord.addEventListener('click', (e) => {
             if (e.target.classList.contains('view-profile-btn')) {
