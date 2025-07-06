@@ -45,7 +45,7 @@ const registerAPI = async (studentData) => {
 }
 
 const updateAPI = async (studentId, studentData) => {
-    showLoader(); 
+    showLoader();
     try {
         const response = await fetch(`/api/students/${studentId}`, {
             method: 'PUT',
@@ -98,7 +98,7 @@ const updateAPI = async (studentId, studentData) => {
 };
 
 const deleteStudentAPI = async (studentId, secretKey) => {
-    showLoader(); 
+    showLoader();
     try {
         const response = await fetch(`/api/students/${studentId}/${secretKey}`, { method: 'DELETE' });
         const result = await response.json();
@@ -358,6 +358,157 @@ document.getElementById('mno').addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
 });
 
+const openSheetModal = (pdfUrl) => {
+    const isMobile = window.innerWidth < 768;
+
+    if(isMobile)
+    {
+        const modalMobile = new bootstrap.Modal('#viewSheetMobile');
+        document.getElementById('studentSheetMobile').src = pdfUrl;
+        modalMobile.show();
+    }
+    else
+    {
+        const modalDesktop = new bootstrap.Modal('#viewSheet');
+        document.getElementById('studentSheet').src = pdfUrl;
+        modalDesktop.show();
+    }
+}
+
+
+const initPageLoadLogic = async () => {
+    const studentRecord = document.getElementById('student-record');
+    const studentStatus = document.getElementById('student-status');
+
+    let students;
+    try {
+        const response = await fetch('/api/students');
+        students = await response.json();
+
+        studentRecord.innerHTML = students.map((student, index) => `<tr>
+        <td>${index + 1}</td>
+        <td>${student.name}</td>
+        <td>${new Date(student.dobDate).toLocaleDateString('en-GB')}</td>
+        <td>${student.email}</td>
+        <td>${student.course}</td>
+        <td>${student.mno}</td>
+        <td>${student.address}</td>
+        <td class="d-flex align-items-center gap-2 m-3">
+            <button type="button" class="btn btn-primary view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">View</button>
+            <button type="button" class="btn btn-primary view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">View</button> 
+            <button type="button" class="btn btn-primary view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">View</button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-warning m-1" style="width:3rem" 
+                data-profilePic="${student.profilePic}"
+                data-signature="${student.signature}"
+                data-sheetcopy="${student.sheetCopy}"
+                data-id="${student.id}" 
+                data-name="${student.name}"
+                data-dob="${student.dobDate}"
+                data-email="${student.email}"
+                data-course="${student.course}"
+                data-mno="${student.mno}"
+                data-address="${student.address}">✏️</button> 
+            <button type="button" class="btn btn-danger m-1" style="width:3rem" data-id="${student.id}">X</button>
+        </td>
+        <td><div class="rounded-circle bg-success d-inline-block" style="width: 10px; height: 10px;"></div></td>
+        </tr>`);
+
+        studentStatus.innerHTML = students.map((student, index) => `  <div class="row" id="student-record-cards">
+        
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">👤 ${student.name}</h5>
+              <p class="card-text"><strong>Email:</strong> ${student.email}</p>
+              <p class="card-text"><strong>DOB:</strong> ${new Date(student.dobDate).toLocaleDateString('en-GB')}</p>
+              <p class="card-text"><strong>Course:</strong> ${student.course}</p>
+              <p class="card-text"><strong>Mobile:</strong> ${student.mno}</p>
+              <p class="card-text"><strong>Address:</strong> ${student.address}</p>
+              <div class="mb-2">
+                <strong>Docs:</strong><br />
+                <a href="#" class="view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">Profile</a> |
+                <a href="#" class="view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">Sign</a> |
+                <a href="#" class="view-sheet-btn" data-sheetcopy="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">Marksheet</a>
+              </div>
+              <div class="mb-2">
+                <button type="button" class="btn btn-warning" 
+                     data-profilePic="${student.profilePic}"
+                     data-signature="${student.signature}"
+                     data-sheetcopy="${student.sheetCopy}"
+                     data-id="${student.id}" 
+                     data-name="${student.name}"
+                     data-dob="${student.dobDate}"
+                     data-email="${student.email}"
+                     data-course="${student.course}"
+                     data-mno="${student.mno}"
+                     data-address="${student.address}">Update</button> 
+                <button type="button" class="btn btn-danger" data-id="${student.id}">Delete</button>
+              </div>
+            </div>
+            <div class="card-footer text-muted text-center">✅ Approved</div>
+          </div>
+        </div>
+      </div>
+    `);
+        // Event delegation for view-profile buttons
+        studentRecord.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-profile-btn')) {
+                const profilePic = e.target.getAttribute('data-profilepic');
+                const studentPic = document.getElementById('studentPic');
+                studentPic.src = `/uploads/${profilePic}`;
+            }
+        });
+
+        studentStatus.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-profile-btn')) {
+                const profilePic = e.target.getAttribute('data-profilepic');
+                const studentPic = document.getElementById('studentPic');
+                studentPic.src = `/uploads/${profilePic}`;
+            }
+        });
+
+        studentRecord.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-sign-btn')) {
+                const signPic = e.target.getAttribute('data-signature');
+                const studentSign = document.getElementById('studentSign');
+                studentSign.src = `/uploads/${signPic}`;
+            }
+        });
+
+        studentStatus.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-sign-btn')) {
+                const signPic = e.target.getAttribute('data-signature');
+                const studentSign = document.getElementById('studentSign');
+                studentSign.src = `/uploads/${signPic}`;
+            }
+        });
+
+        studentRecord.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-sheet-btn')) {
+                const sheetDoc = e.target.getAttribute('data-sheet');
+                const marksheetDoc = document.getElementById('studentSheet');
+                marksheetDoc.src = `/uploads/${sheetDoc}`;
+            }
+        });
+
+        studentStatus.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-sheet-btn')) {
+                const sheetDoc = e.target.getAttribute('data-sheet');
+                const marksheetDoc = document.getElementById('studentSheetMobile');
+                marksheetDoc.src = `/uploads/${sheetDoc}`;
+            }
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        studentRecord.innerHTML = `<tr><td colspan="6">Error fetching data</td></tr>`;
+        return;
+    }
+}
+
 document.getElementById('update-student-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -429,6 +580,23 @@ document.getElementById('updateMno').addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
 });
 
+document.getElementById('updateProfilePic').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const profilePreview = document.getElementById('updatePreviewImage');
+    profilePreview.src = URL.createObjectURL(file);
+});
+
+document.getElementById('updateSignature').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const profilePreview = document.getElementById('updatePreviewSignature');
+    profilePreview.src = URL.createObjectURL(file);
+});
+
+document.getElementById('updateSheetCopy').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const profilePreview = document.getElementById('updatePreviewSheet');
+    profilePreview.src = URL.createObjectURL(file);
+});
 
 document.getElementById('marksheetForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -595,60 +763,70 @@ document.getElementById('roll-form').addEventListener('submit', async (e) => {
     }
 });
 
+const updateEvent = (data) => {
+    const studentId = data.getAttribute('data-id');
+    const studentName = data.getAttribute('data-name');
+    const studentDob = data.getAttribute('data-dob');
+    const studentEmail = data.getAttribute('data-email');
+    const studentCourse = data.getAttribute('data-course');
+    const studentMNO = data.getAttribute('data-mno');
+    const studentAddress = data.getAttribute('data-address');
+    const studentProfilePic = data.getAttribute('data-profilepic');
+    const studentSignature = data.getAttribute('data-signature');
+    const studentSheetCopy = data.getAttribute('data-sheetcopy');
+
+    // Fill modal
+    document.getElementById('updateName').value = studentName;
+    document.getElementById('updateEmail').value = studentEmail;
+    document.getElementById('updateDOB').value = new Date(studentDob).toLocaleDateString('en-GB')
+    document.getElementById('updateCourse').value = studentCourse;
+    document.getElementById('updateMno').value = studentMNO;
+    document.getElementById('updateAddress').value = studentAddress;
+    document.getElementById('updDobPicker').value = studentDob;
+
+    document.getElementById('updatePreviewImage').src = `/uploads/${studentProfilePic}`;
+    document.getElementById('updatePreviewSignature').src = `/uploads/${studentSignature}`;
+    document.getElementById('updatePreviewSheet').src = `/uploads/${studentSheetCopy}`;
+
+    document.getElementById('updatePreviewImage').style.display = 'block';
+    document.getElementById('updatePreviewSignature').style.display = 'block';
+    document.getElementById('updatePreviewSheet').style.display = 'block';
+
+    // Date of birth picker logic
+    const dobPicker = document.getElementById('updDobPicker');
+    const dobInput = document.getElementById('updateDOB');
+
+    // Show date picker when text input is clicked
+    dobInput.addEventListener('click', () => {
+        dobPicker.showPicker(); // For better native behavior (modern browsers)
+    });
+
+    // When date is selected, format and show it
+    dobPicker.addEventListener('change', (e) => {
+        const date = new Date(e.target.value);
+
+        if (!isNaN(date)) {
+            dobInput.value = date.toLocaleDateString('en-GB');
+        }
+
+    });
+    document.getElementById('updateModal').dataset.studentId = studentId;
+
+    const modal = new bootstrap.Modal(document.getElementById('updateModal'));
+    modal.show();
+}
+
 document.getElementById('student-record').addEventListener('click', (e) => {
     if (e.target.classList.contains('btn-warning')) {
         const button = e.target;
+        updateEvent(button);
+    }
+});
 
-        const studentId = button.getAttribute('data-id');
-        const studentName = button.getAttribute('data-name');
-        const studentDob = button.getAttribute('data-dob');
-        const studentEmail = button.getAttribute('data-email');
-        const studentCourse = button.getAttribute('data-course');
-        const studentMNO = button.getAttribute('data-mno');
-        const studentAddress = button.getAttribute('data-address');
-        const studentProfilePic = button.getAttribute('data-profilepic');
-        const studentSignature = button.getAttribute('data-signature');
-        const studentSheetCopy = button.getAttribute('data-sheetcopy');
-
-        // Fill modal
-        document.getElementById('updateName').value = studentName;
-        document.getElementById('updateEmail').value = studentEmail;
-        document.getElementById('updateDOB').value = new Date(studentDob).toLocaleDateString('en-GB')
-        document.getElementById('updateCourse').value = studentCourse;
-        document.getElementById('updateMno').value = studentMNO;
-        document.getElementById('updateAddress').value = studentAddress;
-        document.getElementById('updDobPicker').value = studentDob;
-
-        document.getElementById('updatePreviewImage').src = `/uploads/${studentProfilePic}`;
-        document.getElementById('updatePreviewSignature').src = `/uploads/${studentSignature}`;
-        document.getElementById('updatePreviewSheet').src = `/uploads/${studentSheetCopy}`;
-
-        document.getElementById('updatePreviewImage').style.display = 'block';
-        document.getElementById('updatePreviewSignature').style.display = 'block';
-        document.getElementById('updatePreviewSheet').style.display = 'block';
-
-        // Date of birth picker logic
-        const dobPicker = document.getElementById('updDobPicker');
-        const dobInput = document.getElementById('updateDOB');
-
-        // Show date picker when text input is clicked
-        dobInput.addEventListener('click', () => {
-            dobPicker.showPicker(); // For better native behavior (modern browsers)
-        });
-
-        // When date is selected, format and show it
-        dobPicker.addEventListener('change', (e) => {
-            const date = new Date(e.target.value);
-
-            if (!isNaN(date)) {
-                dobInput.value = date.toLocaleDateString('en-GB');
-            }
-
-        });
-        document.getElementById('updateModal').dataset.studentId = studentId;
-
-        const modal = new bootstrap.Modal(document.getElementById('updateModal'));
-        modal.show();
+document.getElementById('student-status').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-warning')) {
+        const button = e.target;
+        updateEvent(button);
     }
 });
 
@@ -659,7 +837,16 @@ document.getElementById('student-record').addEventListener('click', async (e) =>
 
         showKeyPopup(studentId, null)
     }
-})
+});
+
+document.getElementById('student-status').addEventListener('click', async (e) => {
+    if (e.target.classList.contains('btn-danger')) {
+        const button = e.target;
+        const studentId = button.getAttribute('data-id');
+
+        showKeyPopup(studentId, null)
+    }
+});
 
 document.getElementById('resultForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -745,114 +932,7 @@ document.getElementById('resultForm').addEventListener('submit', async (e) => {
     }
 });
 
-window.addEventListener('load', async () => {
-    const studentRecord = document.getElementById('student-record');
-    const studentStatus = document.getElementById('student-status');
-
-    let students;
-    try {
-        const response = await fetch('/api/students');
-        students = await response.json();
-
-        studentRecord.innerHTML = students.map((student, index) => `<tr>
-        <td>${index + 1}</td>
-        <td>${student.name}</td>
-        <td>${new Date(student.dobDate).toLocaleDateString('en-GB')}</td>
-        <td>${student.email}</td>
-        <td>${student.course}</td>
-        <td>${student.mno}</td>
-        <td>${student.address}</td>
-        <td>
-            <button type="button" class="btn btn-primary view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">View</button>
-            <button type="button" class="btn btn-primary view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">View</button> 
-            <button type="button" class="btn btn-primary view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">View</button>
-        </td>
-        <td>
-            <button type="button" class="btn btn-warning" 
-                data-profilePic="${student.profilePic}"
-                data-signature="${student.signature}"
-                data-sheetcopy="${student.sheetCopy}"
-                data-id="${student.id}" 
-                data-name="${student.name}"
-                data-dob="${student.dobDate}"
-                data-email="${student.email}"
-                data-course="${student.course}"
-                data-mno="${student.mno}"
-                data-address="${student.address}">✏️</button> 
-            <button type="button" class="btn btn-danger" data-id="${student.id}">X</button>
-        </td>
-        <td><div class="rounded-circle bg-success d-inline-block" style="width: 10px; height: 10px;"></div></td>
-        </tr>`);
-
-        studentStatus.innerHTML = students.map((student, index) => `  <div class="row" id="student-record-cards">
-        
-        <div class="col-md-6 col-lg-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">👤 ${student.name}</h5>
-              <p class="card-text"><strong>Email:</strong> ${student.email}</p>
-              <p class="card-text"><strong>DOB:</strong> ${new Date(student.dobDate).toLocaleDateString('en-GB')}</p>
-              <p class="card-text"><strong>Course:</strong> ${student.course}</p>
-              <p class="card-text"><strong>Mobile:</strong> ${student.mno}</p>
-              <p class="card-text"><strong>Address:</strong> ${student.address}</p>
-              <div class="mb-2">
-                <strong>Docs:</strong><br />
-                <a href="#" class="view-profile-btn" data-profilepic="${student.profilePic}" data-bs-toggle="modal" data-bs-target="#viewProfilePic">Profile</a> |
-                <a href="#" class="view-sign-btn" data-signature="${student.signature}" data-bs-toggle="modal" data-bs-target="#viewSignPic">Sign</a> |
-                <a href="#" class="view-sheet-btn" data-sheet="${student.sheetCopy}" data-bs-toggle="modal" data-bs-target="#viewSheet">Marksheet</a>
-              </div>
-              <div class="mb-2">
-                <button type="button" class="btn btn-warning" 
-                     data-profilePic="${student.profilePic}"
-                     data-signature="${student.signature}"
-                     data-sheetcopy="${student.sheetCopy}"
-                     data-id="${student.id}" 
-                     data-name="${student.name}"
-                     data-dob="${student.dobDate}"
-                     data-email="${student.email}"
-                     data-course="${student.course}"
-                     data-mno="${student.mno}"
-                     data-address="${student.address}">Update</button> 
-                <button type="button" class="btn btn-danger" data-id="${student.id}">Delete</button>
-              </div>
-            </div>
-            <div class="card-footer text-muted text-center">✅ Approved</div>
-          </div>
-        </div>
-      </div>
-    `);
-        // Event delegation for view-profile buttons
-        studentRecord.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-profile-btn')) {
-                const profilePic = e.target.getAttribute('data-profilepic');
-                const studentPic = document.getElementById('studentPic');
-                studentPic.src = `/uploads/${profilePic}`;
-            }
-        });
-
-        studentRecord.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-sign-btn')) {
-                const signPic = e.target.getAttribute('data-signature');
-                const studentSign = document.getElementById('studentSign');
-                studentSign.src = `/uploads/${signPic}`;
-            }
-        });
-
-        studentRecord.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-sheet-btn')) {
-                const sheetDoc = e.target.getAttribute('data-sheet');
-                const marksheetDoc = document.getElementById('studentSheet');
-                marksheetDoc.src = `/uploads/${sheetDoc}`;
-            }
-        });
-
-
-    } catch (error) {
-        console.log(error);
-        studentRecord.innerHTML = `<tr><td colspan="6">Error fetching data</td></tr>`;
-        return;
-    }
-});
+window.addEventListener('load', initPageLoadLogic);
 
 document.getElementById('logOut').addEventListener('click', () => {
     Swal.fire({
@@ -868,16 +948,16 @@ document.getElementById('logOut').addEventListener('click', () => {
         .then((result) => {
             if (result.isConfirmed) {
                 fetch('/api/logout')
-                .then(res => res.json())
-                .then(data => {
-                    Swal.fire({
-                        icon:'success',
-                        title: data.message,
-                        showConfirmButton:false,
-                        timer:1500
-                    });
-                })
-                
+                    .then(res => res.json())
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    })
+
                 // Optional: redirect after short delay
                 setTimeout(() => {
                     window.location.href = '/login'; // or '/'

@@ -233,7 +233,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <img src="#" id="sheetPreview" alt="Image" class="w-50" style="display: none;" />
+                        <embed src="#" id="sheetPreview" alt="Image" class="w-50" style="display: none;" />
                     </div>
                 </div>
             </div>
@@ -492,16 +492,39 @@
         </div>
     </div>
 
-    <div class="modal fade" id="viewSheet" aria-hidden="true">
-        <div class="modal-dialog">
+    <!-- MODAL FOR LARGE DEVICES (desktop, landscape tablet) -->
+    <div class="modal fade" id="viewSheet" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Sheet</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+
+                <div class="modal-body">
+                    <div class="a4-wrapper">
+                        <embed src="#" id="studentSheet" alt="MarksheetDoc" class="rounded w-100 a4-pdf"
+                            style="height: 50vh; border: none;" />
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <img src="#" id="studentSheet" alt="MarksheetDoc" class="w-100 rounded">
+        </div>
+    </div>
+
+    <!-- MODAL FOR SMALL DEVICES (smartphones, portrait tablets) -->
+    <div class="modal fade" id="viewSheetMobile" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sheet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="w-100">
+                        <embed src="#" id="studentSheetMobile" type="application/pdf" class="w-100"
+                            style="height: 85vh; border: none;" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -564,18 +587,18 @@
 
                             <!-- File Uploads -->
                             <div class="col-md-4">
-                                <label for="profilePic" class="form-label">Profile Picture</label>
-                                <input type="file" name="profilePic" id="profilePic" class="form-control">
+                                <label for="updateProfilePic" class="form-label">Profile Picture</label>
+                                <input type="file" name="profilePic" id="updateProfilePic" class="form-control">
                             </div>
 
                             <div class="col-md-4">
-                                <label for="signature" class="form-label">Signature</label>
-                                <input type="file" name="signature" id="signature" class="form-control">
+                                <label for="updateSignature" class="form-label">Signature</label>
+                                <input type="file" name="signature" id="updateSignature" class="form-control">
                             </div>
 
                             <div class="col-md-4">
-                                <label for="sheetCopy" class="form-label">Last Marksheet</label>
-                                <input type="file" name="sheetCopy" id="sheetCopy" class="form-control">
+                                <label for="updateSheetCopy" class="form-label">Last Marksheet</label>
+                                <input type="file" name="sheetCopy" id="updateSheetCopy" class="form-control">
                             </div>
 
                             <!-- Image Previews -->
@@ -592,8 +615,8 @@
                             </div>
 
                             <div class="col-md-4 text-center">
-                                <img src="#" id="updatePreviewSheet" alt="Marksheet Preview" class="img-thumbnail w-100"
-                                    style="display:none;" />
+                                <embed src="#" id="updatePreviewSheet" type="application/pdf"
+                                    class="img-thumbnail w-100" style="display:none;" />
                                 <p class="small text-muted mt-1">Marksheet</p>
                             </div>
 
