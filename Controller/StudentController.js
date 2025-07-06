@@ -149,7 +149,7 @@ export const updateStudent = async (req, res) => {
   try {
     const students = await readDB();
     const id = req.params.id;
-    const updatedData = req.body;
+    const data = req.body;
 
     if (!id) {
       return res.status(401).json({ error: 'Id must be required' });
@@ -160,10 +160,18 @@ export const updateStudent = async (req, res) => {
     const updatedStudents = students.map(student => {
       if (student.id === id) {
         isUpdated = true;
+
+        const updatedData = {
+          ...data,
+          profilePic: req.files?.profilePic?.[0]?.filename || student.profilePic,
+          signature: req.files?.signature?.[0]?.filename || student.signature,
+          sheetCopy: req.files?.sheetCopy?.[0]?.filename || student.sheetCopy
+        };
+        
         return {
           ...student,
           ...updatedData,
-          result: updatedData.result || student.result  // ✅ use updated result if sent
+          result: updatedData?.result || student?.result || {}  // ✅ use updated result if sent
         };
       }
       return student;
@@ -192,8 +200,7 @@ export const deleteStudent = async (req, res) => {
       return res.status(401).json({ error: 'Id must be required' });
     }
 
-    if(!secretKey || secretKey !== '123456')
-    {
+    if (!secretKey || secretKey !== '123456') {
       return res.status(401).json({ error: 'SecretKey must be required or Invalid SecretKey' });
     }
 

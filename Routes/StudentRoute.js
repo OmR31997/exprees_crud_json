@@ -31,24 +31,11 @@ router.post('/single', getStudent);
  * @desc    Update student info including profilePic, signature, sheetCopy
  * @access  Protected by secretKey validation
  */
-router.put(
-  '/:id',
-  Upload.fields([
+router.put('/:id', Upload.fields([
     { name: 'profilePic', maxCount: 1 },
     { name: 'signature', maxCount: 1 },
     { name: 'sheetCopy', maxCount: 1 }
-  ]),
-  [
-    body('secretKey')
-      .notEmpty().withMessage('Secret Key is required')
-      .equals('123456').withMessage('Secret Key is incorrect'),
-
-    body('name')
-      .trim()
-      .notEmpty().withMessage('Name is required')
-  ],
-  updateStudent
-);
+  ]), updateStudent);
 
 /**
  * @route   GET /result/:rollNo
