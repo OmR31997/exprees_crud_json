@@ -82,10 +82,10 @@ appServer.get('/api/logout', (req, res) => {
 appServer.use(isAuthenticated, express.static('public'));
 
 // 📦 Student-related routes (GET/POST/PUT/DELETE)
-appServer.use('/api/students', isAuthenticated, StudentRoute);
+appServer.use('/api/students', StudentRoute);
 
 // 📤 Export/download routes like CSV, Excel, PDF
-appServer.use('/api/export/download', isAuthenticated, DownloadRoute);
+appServer.use('/api/export/download', DownloadRoute);
 
 // 🏠 Main page renderer
 appServer.get('/', isAuthenticated, pageUI);
